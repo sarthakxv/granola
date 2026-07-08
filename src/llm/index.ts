@@ -11,13 +11,19 @@ import type { LanguageModel } from "ai";
 // curated open models (DeepSeek, GLM, Kimi, Qwen…). It's just an authenticated
 // HTTPS endpoint, so it runs identically on a laptop and on Vercel serverless.
 
+// The gateway doesn't support JSON-schema `response_format`, so the AI SDK logs
+// a warning on every analyzer call. The fallback works (validated), but the
+// warning leaks into the interactive chat UI. Silence it here. Remove this if we
+// move to a model with native structured-output support.
+(globalThis as { AI_SDK_LOG_WARNINGS?: boolean }).AI_SDK_LOG_WARNINGS = false;
+
 const DEFAULT_MODEL = process.env.OPENCODE_MODEL ?? "deepseek-v4-flash";
 
 export function getModel(): LanguageModel {
   const apiKey = process.env.OPENCODE_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "No OPENCODE_API_KEY set. Add it to prototype/.env (subscribe at https://opencode.ai/docs/go/).",
+      "No OPENCODE_API_KEY set. Add it to .env (subscribe at https://opencode.ai/docs/go/).",
     );
   }
 

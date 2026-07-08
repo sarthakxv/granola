@@ -60,6 +60,14 @@ export function applyAnalysis(
   model: LearnerModel,
   result: AnalyzerResult,
 ): LearnerModel {
+  // Non-substantive messages (meta requests like "reply in English", greetings,
+  // off-topic text) carry no evidence about mastery. Ignore deltas, misconception
+  // changes, and the confidence estimate entirely — just advance the turn. This
+  // stops a non-answer from silently moving the learner model.
+  if (!result.assessable) {
+    return { ...model, turnCount: model.turnCount + 1 };
+  }
+
   const mastery = { ...model.masteryByObjective };
   for (const [id, delta] of Object.entries(result.masteryDeltas)) {
     if (typeof delta !== "number") continue;

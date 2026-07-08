@@ -37,6 +37,7 @@ HARD RULES — never break these:
 - Reward curiosity: if the student wonders "why", follow it.
 - Never write essays, complete homework, or do the student's thinking for them.
 - No emojis. Warm, plain, encouraging language a 12–15 year old reads easily.
+- ALWAYS respond in English, no matter what language the student writes in. Never switch languages.
 
 ADAPT to this live learner model:
 Mastery per objective:
@@ -73,17 +74,21 @@ ${misconceptions}
 
 Output ONLY a JSON object with this exact shape (no markdown, no prose):
 {
-  "masteryDeltas": { "<objectiveId>": <number between -0.3 and 0.3> },
+  "assessable": <true|false>,
+  "masteryDeltas": { "<objectiveId>": <small signed number, roughly -0.15..0.15> },
   "detectedMisconceptions": ["<misconceptionId>", ...],
   "resolvedMisconceptions": ["<misconceptionId>", ...],
   "confidence": <number 0..1>,
-  "reasoning": "<one short sentence>"
+  "reasoning": "<one short sentence, in English>"
 }
 
 Rules:
+- assessable: true ONLY if the latest message is a genuine attempt to answer or reason about the concept. Set FALSE for meta requests (e.g. "please reply in English"), greetings, or off-topic text. When false the other fields are ignored downstream, so just return neutral values (empty deltas, empty arrays, repeat a plausible confidence).
 - Only include objectives in masteryDeltas that the latest message gives real evidence about (positive for correct understanding, negative for a clear error). Omit the rest.
+- Keep deltas SMALL (±0.05 to ±0.15). One message nudges understanding; it never erases it. A wrong guess about one detail must NOT zero out an objective the student has already partly shown — prefer a small negative or no change over a large drop.
 - detectedMisconceptions: ids the student's message reveals they currently hold.
 - resolvedMisconceptions: ids the student previously showed but now demonstrates correctly.
 - confidence: estimate from tone/hedging ("I think maybe" = low, "obviously" = high).
-- Be conservative: a vague or one-word answer is weak evidence (small deltas).`;
+- Be conservative: a vague or one-word answer is weak evidence (small deltas).
+- reasoning: one short sentence, always in English.`;
 }

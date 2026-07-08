@@ -29,7 +29,14 @@ export function emptyLearnerModel(): LearnerModel {
 // Ranges are documented but NOT hard-enforced here: a model returning 1.2 for
 // confidence shouldn't fail the whole turn — we clamp when folding it in.
 export const AnalyzerSchema = z.object({
-  /** objectiveId -> signed delta, roughly [-0.3, +0.3]. */
+  /**
+   * True only if the student's latest message is a genuine attempt to answer or
+   * reason about the concept. False for meta requests ("reply in English"),
+   * greetings, or off-topic text — those carry no evidence and must NOT move the
+   * learner model. Gated in applyAnalysis so non-answers can't pollute state.
+   */
+  assessable: z.boolean(),
+  /** objectiveId -> signed delta, small (roughly ±0.05..±0.15). */
   masteryDeltas: z.record(z.string(), z.number()),
   detectedMisconceptions: z.array(z.string()),
   resolvedMisconceptions: z.array(z.string()),

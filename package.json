@@ -6,7 +6,9 @@
   "description": "CLS Socratic tutor + analyzer loop prototype (photosynthesis)",
   "scripts": {
     "demo": "node --env-file-if-exists=.env --env-file-if-exists=../../../.env --experimental-strip-types src/demo.ts",
-    "chat": "node --env-file-if-exists=.env --env-file-if-exists=../../../.env --experimental-strip-types src/harness.ts"
+    "chat": "node --env-file-if-exists=.env --env-file-if-exists=../../../.env --experimental-strip-types src/harness.ts",
+    "test": "node --test --experimental-strip-types 'src/**/*.test.ts'",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.5",
