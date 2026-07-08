@@ -111,7 +111,8 @@ Output ONLY a JSON object with this exact shape (no markdown, no prose):
 }
 
 Rules:
-- assessable: true ONLY if the latest message is a genuine attempt to answer or reason about the concept. FALSE for meta requests (e.g. "reply in English"), greetings, or off-topic text. When false, the other fields are ignored downstream — return neutral values.
+- assessable: true if the message is ON-TOPIC — engaging this concept or the tutor's question in ANY way. This INCLUDES wrong attempts AND on-topic expressions of being stuck ("I don't know", "I'm not sure", "no idea", "I'm confused", "just tell me"). Set FALSE ONLY for genuinely off-topic or meta messages: a request about the conversation itself (e.g. "reply in English"), a greeting, or an unrelated topic. When false, everything downstream is ignored.
+- A stuck / "I don't know" message about the concept is ALWAYS assessable=true, with scaffoldSignal="stuck", addressedObjective set to the objective the tutor was probing, and empty masteryDeltas (no evidence to score). NEVER mark it assessable=false.
 - addressedObjective: the objective id the student's latest message actually engaged; "" if meta/off-topic/none.
 - scaffoldSignal (relative to the focus objective): "stuck" = no progress, repeating a wrong idea, or "I don't know"; "progressing" = a partial or improving step; "solved" = a correct, complete grasp of the focus objective.
 - requestedAnswer: true only if the student explicitly asks to be told the answer.

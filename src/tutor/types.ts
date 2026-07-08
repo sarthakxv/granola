@@ -47,10 +47,10 @@ export const CONFIDENCE_FLOOR = 0.25; // frustration accelerator threshold
 // confidence shouldn't fail the whole turn — we clamp when folding it in.
 export const AnalyzerSchema = z.object({
   /**
-   * True only if the student's latest message is a genuine attempt to answer or
-   * reason about the concept. False for meta requests ("reply in English"),
-   * greetings, or off-topic text — those carry no evidence and must NOT move the
-   * learner model. Gated in applyAnalysis so non-answers can't pollute state.
+   * True if the message is ON-TOPIC — engaging the concept in any way, INCLUDING
+   * wrong attempts and on-topic "I don't know / I'm stuck" (a stuck ladder signal,
+   * not a disqualifier). False ONLY for meta ("reply in English") / greetings /
+   * off-topic text, which must NOT move the learner model. Gated in applyAnalysis.
    */
   assessable: z.boolean(),
   /** Objective id the student's message engaged; "" if meta/off-topic/none. */

@@ -67,6 +67,17 @@ test("null focus is initialized to the lowest-mastery objective", () => {
   assert.equal(after.focusObjective, "purpose"); // all mastery 0 -> first objective
 });
 
+test("first stuck answer at lesson start escalates (focus init before ladder)", () => {
+  const after = applyAnalysis(
+    emptyLearnerModel(),
+    result({ scaffoldSignal: "stuck", addressedObjective: "", confidence: 0.8 }),
+    C,
+  );
+  assert.equal(after.focusObjective, "purpose"); // focus gets initialized
+  assert.equal(after.scaffoldRung, 1); // and the stuck signal is NOT wiped by that init
+  assert.equal(after.consecutiveStuck, 1);
+});
+
 test("stuck increments rung and consecutiveStuck", () => {
   const before = model({ focusObjective: "inputs", scaffoldRung: 0, consecutiveStuck: 0 });
   const after = applyAnalysis(before, result({ addressedObjective: "inputs", scaffoldSignal: "stuck", confidence: 0.8 }), C);

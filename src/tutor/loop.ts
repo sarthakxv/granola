@@ -22,11 +22,12 @@ export async function tutorTurn(
     messages: history,
     temperature: 0.7,
     // DeepSeek is a reasoning model: chain-of-thought counts against this
-    // budget even though it's excluded from `text`. A tight cap (e.g. 300)
-    // gets fully consumed by reasoning and truncates before any answer is
-    // emitted, yielding empty text. Leave headroom for reasoning + the reply;
-    // the "1–3 short sentences" limit is enforced by the prompt, not this.
-    maxOutputTokens: 2048,
+    // budget even though it's excluded from `text`. A tight cap gets fully
+    // consumed by reasoning and truncates before any answer is emitted, yielding
+    // empty text (finishReason "length"). The scaffold prompt is long and the
+    // history grows, so give generous headroom; the "1–3 short sentences" limit
+    // is enforced by the prompt, not this.
+    maxOutputTokens: 4096,
   });
   const reply = text.trim();
   // Fail loud rather than pushing a blank tutor message into the history — an
@@ -107,6 +108,12 @@ export function applyAnalysis(
   let focus = model.focusObjective;
   let revealed = model.answerRevealed;
 
+  // Initialize focus at lesson start BEFORE the ladder update, so the first real
+  // answer's scaffold signal isn't wiped by focus selection running afterwards.
+  if (focus === null) {
+    focus = pickNextFocus(mastery, concept, revealed);
+  }
+
   if (rung === RUNG_ANSWER) {
     // The tutor delivered the answer last turn. Record it (do NOT auto-bump
     // mastery), advance to a fresh episode on the next objective.
@@ -136,8 +143,8 @@ export function applyAnalysis(
     // offTopic -> neutral: leave rung/stuck/focus unchanged.
   }
 
-  // Focus (re)selection at episode boundaries (start, or focus now mastered).
-  if (focus === null || (mastery[focus] ?? 0) >= MASTERY_THRESHOLD) {
+  // Advance to a fresh episode once the current objective is mastered.
+  if (focus !== null && (mastery[focus] ?? 0) >= MASTERY_THRESHOLD) {
     focus = pickNextFocus(mastery, concept, revealed);
     rung = 0;
     stuck = 0;
