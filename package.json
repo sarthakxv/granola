@@ -1,0 +1,20 @@
+{
+  "name": "cls-prototype",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "CLS Socratic tutor + analyzer loop prototype (photosynthesis)",
+  "scripts": {
+    "demo": "node --env-file-if-exists=.env --env-file-if-exists=../../../.env --experimental-strip-types src/demo.ts",
+    "chat": "node --env-file-if-exists=.env --env-file-if-exists=../../../.env --experimental-strip-types src/harness.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.5",
+    "ai": "^7.0.17",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^6.0.3"
+  }
+}
