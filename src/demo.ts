@@ -42,7 +42,7 @@ async function main() {
     history.push({ role: "user", content: studentText });
 
     // 1) Analyze the student's answer → update the learner model.
-    const analysis = await analyzeTurn(llm, concept, history);
+    const analysis = await analyzeTurn(llm, concept, history, model.focusObjective);
     model = applyAnalysis(model, analysis, concept);
 
     // 2) Tutor responds, adapted to the freshly-updated model.

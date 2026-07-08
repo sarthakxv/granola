@@ -47,10 +47,11 @@ export async function analyzeTurn(
   llm: LanguageModel,
   concept: Concept,
   history: ChatMessage[],
+  focusObjective: string | null,
 ): Promise<AnalyzerResult> {
   const { output } = await generateText({
     model: llm,
-    system: buildAnalyzerSystem(concept),
+    system: buildAnalyzerSystem(concept, focusObjective),
     messages: history,
     temperature: 0,
     output: Output.object({ schema: AnalyzerSchema }),

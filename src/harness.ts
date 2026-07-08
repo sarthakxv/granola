@@ -62,7 +62,7 @@ async function main() {
     history.push({ role: "user", content: input });
     const analysis = await withSpinner(
       "assessing your answer…",
-      analyzeTurn(llm, concept, history),
+      analyzeTurn(llm, concept, history, model.focusObjective),
     );
     model = applyAnalysis(model, analysis, concept);
     const reply = await withSpinner(
