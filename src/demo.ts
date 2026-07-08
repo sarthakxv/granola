@@ -43,7 +43,7 @@ async function main() {
 
     // 1) Analyze the student's answer → update the learner model.
     const analysis = await analyzeTurn(llm, concept, history);
-    model = applyAnalysis(model, analysis);
+    model = applyAnalysis(model, analysis, concept);
 
     // 2) Tutor responds, adapted to the freshly-updated model.
     const reply = await tutorTurn(llm, concept, model, history);

@@ -64,7 +64,7 @@ async function main() {
       "assessing your answer…",
       analyzeTurn(llm, concept, history),
     );
-    model = applyAnalysis(model, analysis);
+    model = applyAnalysis(model, analysis, concept);
     const reply = await withSpinner(
       "tutor is thinking…",
       tutorTurn(llm, concept, model, history),

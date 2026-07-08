@@ -1,3 +1,4 @@
 .env
 .demo_out.txt
 node_modules/
+.DS_Store

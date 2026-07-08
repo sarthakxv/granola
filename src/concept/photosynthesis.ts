@@ -20,6 +20,8 @@ export interface Concept {
   title: string;
   objectives: Objective[];
   misconceptions: Misconception[];
+  /** Language the tutor must reply in. Defaults to English when omitted. */
+  targetLanguage?: string;
 }
 
 export const PHOTOSYNTHESIS: Concept = {
