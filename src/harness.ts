@@ -4,7 +4,7 @@
 
 import { createInterface } from "node:readline/promises";
 import { stdin, stdout } from "node:process";
-import { getModel, modelLabel } from "./llm/index.ts";
+import { getAnalyzerModel, getTutorModel, modelLabel } from "./llm/index.ts";
 import type { ChatMessage } from "./llm/types.ts";
 import { PHOTOSYNTHESIS } from "./concept/photosynthesis.ts";
 import { emptyLearnerModel } from "./tutor/types.ts";
@@ -27,7 +27,8 @@ async function withSpinner<T>(label: string, work: Promise<T>): Promise<T> {
 }
 
 async function main() {
-  const llm = getModel();
+  const tutorModel = getTutorModel();
+  const analyzerModel = getAnalyzerModel();
   const concept = PHOTOSYNTHESIS;
   let model = emptyLearnerModel();
   const history: ChatMessage[] = [];
@@ -40,7 +41,7 @@ async function main() {
   history.push({ role: "user", content: seed });
   const opening = await withSpinner(
     "tutor is thinking…",
-    tutorTurn(llm, concept, model, history),
+    tutorTurn(tutorModel, concept, model, history),
   );
   history.push({ role: "assistant", content: opening });
   console.log(`TUTOR: ${opening}\n`);
@@ -62,12 +63,12 @@ async function main() {
     history.push({ role: "user", content: input });
     const analysis = await withSpinner(
       "assessing your answer…",
-      analyzeTurn(llm, concept, history, model.focusObjective),
+      analyzeTurn(analyzerModel, concept, history, model.focusObjective),
     );
     model = applyAnalysis(model, analysis, concept);
     const reply = await withSpinner(
       "tutor is thinking…",
-      tutorTurn(llm, concept, model, history),
+      tutorTurn(tutorModel, concept, model, history),
     );
     history.push({ role: "assistant", content: reply });
     console.log(`\nTUTOR: ${reply}\n`);

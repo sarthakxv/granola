@@ -3,7 +3,7 @@
 // and is walked toward understanding. Watch the learner-model panel move and
 // the misconception clear — that's the whole thesis of the product working.
 
-import { getModel, modelLabel } from "./llm/index.ts";
+import { getAnalyzerModel, getTutorModel, modelLabel } from "./llm/index.ts";
 import type { ChatMessage } from "./llm/types.ts";
 import { PHOTOSYNTHESIS } from "./concept/photosynthesis.ts";
 import { emptyLearnerModel } from "./tutor/types.ts";
@@ -21,7 +21,8 @@ const STUDENT_TURNS = [
 ];
 
 async function main() {
-  const llm = getModel();
+  const tutorModel = getTutorModel();
+  const analyzerModel = getAnalyzerModel();
   const concept = PHOTOSYNTHESIS;
   let model = emptyLearnerModel();
   const history: ChatMessage[] = [];
@@ -30,7 +31,7 @@ async function main() {
   console.log(`provider: ${modelLabel()}\n`);
 
   // Opening diagnostic probe (no student input yet).
-  const opening = await tutorTurn(llm, concept, model, [
+  const opening = await tutorTurn(tutorModel, concept, model, [
     { role: "user", content: "I'm ready to learn about photosynthesis." },
   ]);
   history.push({ role: "user", content: "I'm ready to learn about photosynthesis." });
@@ -42,11 +43,11 @@ async function main() {
     history.push({ role: "user", content: studentText });
 
     // 1) Analyze the student's answer → update the learner model.
-    const analysis = await analyzeTurn(llm, concept, history, model.focusObjective);
+    const analysis = await analyzeTurn(analyzerModel, concept, history, model.focusObjective);
     model = applyAnalysis(model, analysis, concept);
 
     // 2) Tutor responds, adapted to the freshly-updated model.
-    const reply = await tutorTurn(llm, concept, model, history);
+    const reply = await tutorTurn(tutorModel, concept, model, history);
     history.push({ role: "assistant", content: reply });
 
     console.log(`  ↳ analysis: ${analysis.reasoning}`);

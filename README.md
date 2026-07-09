@@ -36,15 +36,18 @@ npm run chat    # talk to the tutor yourself; /state shows the learner model
 npx tsc --noEmit   # typecheck
 ```
 
-The default model is `deepseek-v4-flash`; override with `OPENCODE_MODEL`
-(see the gateway's `/v1/models`). Swapping to Anthropic/Google/OpenAI later is a
-one-function edit in `src/llm/index.ts`.
+The tutor defaults to `deepseek-v4-pro` (needs to hold the Socratic line under
+an instruction-heavy prompt); the analyzer defaults to `deepseek-v4-flash`
+(cheap structured-JSON scoring is enough there). Override either with
+`OPENCODE_TUTOR_MODEL` / `OPENCODE_ANALYZER_MODEL` (see the gateway's
+`/v1/models`). Swapping to Anthropic/Google/OpenAI later is a one-file edit in
+`src/llm/index.ts`.
 
 ## Layout (maps 1:1 onto the future Next.js `lib/`)
 
 | File | Role | Future home |
 |------|------|-------------|
-| `src/llm/` | provider registry: `getModel()` returns a Vercel AI SDK model | `lib/llm/` |
+| `src/llm/` | provider registry: `getTutorModel()` / `getAnalyzerModel()` return Vercel AI SDK models | `lib/llm/` |
 | `src/concept/photosynthesis.ts` | concept graph: objectives + misconceptions | DB seed + `lib/concept/` |
 | `src/tutor/prompts.ts` | Socratic tutor + analyzer system prompts | `lib/tutor/` |
 | `src/tutor/loop.ts` | orchestration: `tutorTurn`, `analyzeTurn`, `applyAnalysis` | API route handlers |
@@ -57,8 +60,9 @@ one-function edit in `src/llm/index.ts`.
 - Misconceptions are **detected and cleared** as structured state, not vibes.
 - The **learner model moves** turn to turn — the substrate for the mastery dashboard
   and the recall scheduler.
-- Provider choice is **one function** (`getModel()`) — the tutor/analyzer never
-  see a vendor. Validated live on OpenCode go / DeepSeek v4 flash.
+- Provider choice is **one file** (`src/llm/index.ts`) — the tutor/analyzer never
+  see a vendor. Validated live on OpenCode go / DeepSeek v4 (pro for the tutor,
+  flash for the analyzer).
 
 ## Next step toward the product
 
