@@ -21,7 +21,7 @@ export async function tutorTurn(
     system: buildTutorSystem(concept, model),
     messages: history,
     temperature: 0.7,
-    // DeepSeek is a reasoning model: chain-of-thought counts against this
+    // GLM is a reasoning model: chain-of-thought counts against this
     // budget even though it's excluded from `text`. A tight cap gets fully
     // consumed by reasoning and truncates before any answer is emitted, yielding
     // empty text (finishReason "length"). The scaffold prompt is long and the

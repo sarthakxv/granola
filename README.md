@@ -36,7 +36,7 @@ npm run chat    # talk to the tutor yourself; /state shows the learner model
 npx tsc --noEmit   # typecheck
 ```
 
-The tutor defaults to `deepseek-v4-pro` (needs to hold the Socratic line under
+The tutor defaults to `glm-5.2` (needs to hold the Socratic line under
 an instruction-heavy prompt); the analyzer defaults to `deepseek-v4-flash`
 (cheap structured-JSON scoring is enough there). Override either with
 `OPENCODE_TUTOR_MODEL` / `OPENCODE_ANALYZER_MODEL` (see the gateway's

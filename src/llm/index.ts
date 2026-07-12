@@ -22,7 +22,7 @@ import type { LanguageModel } from "ai";
 // move to a model with native structured-output support.
 (globalThis as { AI_SDK_LOG_WARNINGS?: boolean }).AI_SDK_LOG_WARNINGS = false;
 
-const TUTOR_MODEL = process.env.OPENCODE_TUTOR_MODEL ?? "deepseek-v4-pro";
+const TUTOR_MODEL = process.env.OPENCODE_TUTOR_MODEL ?? "glm-5.2";
 const ANALYZER_MODEL = process.env.OPENCODE_ANALYZER_MODEL ?? "deepseek-v4-flash";
 
 function opencodeClient() {
