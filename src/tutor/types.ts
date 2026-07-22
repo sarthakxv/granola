@@ -20,6 +20,10 @@ export interface LearnerModel {
   consecutiveStuck: number;
   /** Objectives whose answer was revealed; pending a retrieval re-check. */
   answerRevealed: string[];
+  /** Assessable on-topic turns spent on the current focus objective (backstop counter). */
+  turnsOnObjective: number;
+  /** True once every objective's mastery is at or above MASTERY_THRESHOLD. */
+  lessonComplete: boolean;
 }
 
 export function emptyLearnerModel(): LearnerModel {
@@ -32,6 +36,8 @@ export function emptyLearnerModel(): LearnerModel {
     scaffoldRung: 0,
     consecutiveStuck: 0,
     answerRevealed: [],
+    turnsOnObjective: 0,
+    lessonComplete: false,
   };
 }
 
@@ -39,6 +45,9 @@ export function emptyLearnerModel(): LearnerModel {
 export const RUNG_ANSWER = 3;        // terminal rung: state the answer
 export const MASTERY_THRESHOLD = 0.7; // objective considered mastered -> advance
 export const CONFIDENCE_FLOOR = 0.25; // frustration accelerator threshold
+export const MAX_TURNS_ON_OBJECTIVE = 5;  // #3a: after N turns on one objective, force the answer
+export const STRUGGLE_THRESHOLD = 2;     // #3b: if N objectives needed answer reveals, start new ones higher
+export const STRUGGLE_START_RUNG = 1;    // #3b: skip bare-question phase, go to hint
 
 // What the analyzer emits after each student message.
 // Defined as a Zod schema so `generateObject` validates + coerces the model's

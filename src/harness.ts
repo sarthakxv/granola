@@ -73,6 +73,10 @@ async function main() {
     history.push({ role: "assistant", content: reply });
     console.log(`\nTUTOR: ${reply}\n`);
     console.log(renderPanel(concept, model) + "\n");
+    if (model.lessonComplete) {
+      console.log("=== lesson complete — closing session ===\n");
+      break;
+    }
   }
 
   rl.close();

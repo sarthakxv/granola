@@ -4,6 +4,7 @@ import type { Concept } from "../concept/photosynthesis.ts";
 import {
   AnalyzerSchema, type AnalyzerResult, type LearnerModel,
   RUNG_ANSWER, MASTERY_THRESHOLD, CONFIDENCE_FLOOR,
+  MAX_TURNS_ON_OBJECTIVE, STRUGGLE_THRESHOLD, STRUGGLE_START_RUNG,
 } from "./types.ts";
 import { buildAnalyzerSystem, buildTutorSystem } from "./prompts.ts";
 
@@ -79,6 +80,12 @@ export function pickNextFocus(
   return pool[0].id;
 }
 
+// Compute the starting rung for a new objective based on session-level struggle.
+// If enough prior objectives needed answer reveals, skip the bare-question phase.
+function struggleStartRung(revealed: string[]): number {
+  return revealed.length >= STRUGGLE_THRESHOLD ? STRUGGLE_START_RUNG : 0;
+}
+
 // Fold an analyzer result into the learner model (pure — returns a new model).
 export function applyAnalysis(
   model: LearnerModel,
@@ -107,11 +114,13 @@ export function applyAnalysis(
   let stuck = model.consecutiveStuck;
   let focus = model.focusObjective;
   let revealed = model.answerRevealed;
+  let turnsOnObjective = model.turnsOnObjective;
 
   // Initialize focus at lesson start BEFORE the ladder update, so the first real
   // answer's scaffold signal isn't wiped by focus selection running afterwards.
   if (focus === null) {
     focus = pickNextFocus(mastery, concept, revealed);
+    turnsOnObjective = 0;
   }
 
   if (rung === RUNG_ANSWER) {
@@ -119,12 +128,14 @@ export function applyAnalysis(
     // mastery), advance to a fresh episode on the next objective.
     if (focus && !revealed.includes(focus)) revealed = [...revealed, focus];
     focus = pickNextFocus(mastery, concept, revealed);
-    rung = 0;
+    rung = struggleStartRung(revealed);
     stuck = 0;
+    turnsOnObjective = 0;
   } else {
     const offTopic =
       result.addressedObjective !== "" && result.addressedObjective !== focus;
     if (!offTopic) {
+      turnsOnObjective++;
       if (result.requestedAnswer && stuck >= 1) {
         rung = RUNG_ANSWER; // explicit ask, only after >=1 post-support attempt
       } else if (result.scaffoldSignal === "stuck") {
@@ -136,9 +147,14 @@ export function applyAnalysis(
         stuck = 0;
       } else if (result.scaffoldSignal === "solved") {
         focus = pickNextFocus(mastery, concept, revealed);
-        rung = 0;
+        rung = struggleStartRung(revealed);
         stuck = 0;
+        turnsOnObjective = 0;
       }
+    }
+    // Backstop: after N turns on this objective without solving, force the answer.
+    if (turnsOnObjective >= MAX_TURNS_ON_OBJECTIVE && rung < RUNG_ANSWER) {
+      rung = RUNG_ANSWER;
     }
     // offTopic -> neutral: leave rung/stuck/focus unchanged.
   }
@@ -146,9 +162,14 @@ export function applyAnalysis(
   // Advance to a fresh episode once the current objective is mastered.
   if (focus !== null && (mastery[focus] ?? 0) >= MASTERY_THRESHOLD) {
     focus = pickNextFocus(mastery, concept, revealed);
-    rung = 0;
+    rung = struggleStartRung(revealed);
     stuck = 0;
+    turnsOnObjective = 0;
   }
+
+  const lessonComplete = concept.objectives.every(
+    (o) => (mastery[o.id] ?? 0) >= MASTERY_THRESHOLD,
+  );
 
   return {
     masteryByObjective: mastery,
@@ -159,5 +180,7 @@ export function applyAnalysis(
     scaffoldRung: rung,
     consecutiveStuck: stuck,
     answerRevealed: revealed,
+    turnsOnObjective,
+    lessonComplete,
   };
 }
