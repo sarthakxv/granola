@@ -20,7 +20,8 @@ export function renderPanel(concept: Concept, model: LearnerModel): string {
     "┌─ learner model " + "─".repeat(46),
     ...lines,
     "  " + "-".repeat(52),
-    `  confidence: ${Math.round(model.confidence * 100)}%   active misconceptions: ${mc}`,
+    `  confidence: ${Math.round(model.confidence * 100)}%   rung: ${model.scaffoldRung}   turns on obj: ${model.turnsOnObjective}   misconceptions: ${mc}`,
+    `  answer revealed: ${model.answerRevealed.length} objective(s)${model.answerRevealed.length >= 2 ? "  ⚡ struggle mode" : ""}`,
     "└" + "─".repeat(61),
   ].join("\n");
 }

@@ -54,6 +54,11 @@ async function main() {
     console.log(`TUTOR: ${reply}\n`);
     console.log(renderPanel(concept, model) + "\n");
 
+    if (model.lessonComplete) {
+      console.log("=== lesson complete — closing session early ===\n");
+      break;
+    }
+
     // Small courtesy gap between turns (OpenCode go has generous limits).
     await new Promise((r) => setTimeout(r, 1500));
   }

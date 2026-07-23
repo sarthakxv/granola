@@ -21,6 +21,18 @@ test("tutor prompt with null focus gives the Predict opening, no rung", () => {
   assert.match(p, /PREDICTION|lesson is just starting/i);
 });
 
+test("tutor prompt shows a completion message when lessonComplete is true", () => {
+  const model = { ...emptyLearnerModel(), lessonComplete: true, focusObjective: null };
+  const p = buildTutorSystem(PHOTOSYNTHESIS, model);
+  assert.match(p, /LESSON COMPLETE/i);
+});
+
+test("ladder rung 0 pairs the question with a directional hint", () => {
+  const model = { ...emptyLearnerModel(), focusObjective: "inputs", scaffoldRung: 0 };
+  const p = buildTutorSystem(PHOTOSYNTHESIS, model);
+  assert.match(p, /L0 ask a Socratic question[^·]*hint/i);
+});
+
 test("tutor prompt honors concept.targetLanguage override", () => {
   const hindi: Concept = { ...PHOTOSYNTHESIS, targetLanguage: "Hindi" };
   const p = buildTutorSystem(hindi, { ...emptyLearnerModel(), focusObjective: "inputs", scaffoldRung: 0 });
